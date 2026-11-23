@@ -29,8 +29,8 @@ GitHub Actions runs both commands on pushes to `main` and pull requests.
 - [x] M2 — Open a recipe detail page with ingredients, steps, prep time, and author.
 - [x] M3 — Add a recipe with required-field validation.
 - [x] M4 — Filter by cuisine and category together; clear filters and see an empty state.
-- [x] M5 — Submit 1–5 star ratings and show the average and count (requires PostgreSQL).
-- [ ] M6 — Persist recipes and ratings in the hosted database (set `DATABASE_URL` locally and in Vercel).
+- [x] M5 — Implemented; persistence across devices requires PostgreSQL.
+- [ ] M6 — Partly done: PostgreSQL support and auto-seeding are implemented; connect a hosted database by setting `DATABASE_URL` locally and in Vercel.
 - [x] M7 — Include two sample recipes with different cuisines and categories.
 
 ### Should
@@ -44,16 +44,16 @@ GitHub Actions runs both commands on pushes to `main` and pull requests.
 
 ### Could
 
-- [x] Responsive phone layout.
+- [x] Responsive phone layout (implemented; confirm on a phone).
 
 ### Engineering
 
 - [x] E1 — Public GitHub repository with incremental commits.
 - [x] E2 — `AGENTS.md`, `docs/spec.md`, and `docs/plan.md`.
 - [ ] E3 — At least three passing automated tests (run `npm test`).
-- [ ] E4 — Latest GitHub Actions test/build run passes.
+- [x] E4 — GitHub Actions test/build run passes on `main`.
 - [ ] E5 — Automatic deployment from `main` (connect this repo to Vercel).
-- [ ] E6 — No committed secrets; `.env.example` lists the variable name only.
+- [x] E6 — No secrets are in the project files; `.env.example` lists the variable name only.
 - [ ] E7 — Complete this README with the live Vercel URL after deployment.
 
 ## Stack
