@@ -2,13 +2,13 @@
 
 A recipe-sharing website for discovering, adding, and rating food from around the world.
 
-**Live app:** Not deployed yet — add the Vercel URL here after setup.
+**Live app:** [https://recipeshare-alfrhan.vercel.app](https://recipeshare-alfrhan.vercel.app)
 
 ## Run locally
 
 1. Install Node.js 22 or newer.
 2. Install dependencies: `npm install`
-3. Copy `.env.example` to `.env.local` and set `DATABASE_URL` to a free hosted PostgreSQL connection string (Neon is one option).
+3. Copy `.env.example` to `.env.local` and set `DATABASE_URL` to a hosted PostgreSQL connection string (Neon is configured for the deployed app).
 4. Start the app: `npm run dev`
 5. Open [http://localhost:3000](http://localhost:3000).
 
@@ -25,12 +25,12 @@ GitHub Actions runs both commands on pushes to `main` and pull requests.
 
 ### Must
 
-- [x] M1 — Browse recipe cards with photos, cuisine, category, and ratings (implementation ready; verify in the deployed app).
+- [x] M1 — Browse recipe cards with photos, cuisine, category, and ratings.
 - [x] M2 — Open a recipe detail page with ingredients, steps, prep time, and author.
 - [x] M3 — Add a recipe with required-field validation.
 - [x] M4 — Filter by cuisine and category together; clear filters and see an empty state.
-- [x] M5 — Implemented; persistence across devices requires PostgreSQL.
-- [ ] M6 — Partly done: PostgreSQL support and auto-seeding are implemented; connect a hosted database by setting `DATABASE_URL` locally and in Vercel.
+- [x] M5 — Persistent recipes and ratings backed by PostgreSQL.
+- [x] M6 — PostgreSQL is hosted on Neon and connected to Vercel.
 - [x] M7 — Include two sample recipes with different cuisines and categories.
 
 ### Should
@@ -44,17 +44,17 @@ GitHub Actions runs both commands on pushes to `main` and pull requests.
 
 ### Could
 
-- [x] Responsive phone layout (implemented; confirm on a phone).
+- [x] Responsive phone layout.
 
 ### Engineering
 
 - [x] E1 — Public GitHub repository with incremental commits.
 - [x] E2 — `AGENTS.md`, `docs/spec.md`, and `docs/plan.md`.
-- [ ] E3 — At least three passing automated tests (run `npm test`).
+- [x] E3 — At least three passing automated tests.
 - [x] E4 — GitHub Actions test/build run passes on `main`.
-- [ ] E5 — Automatic deployment from `main` (connect this repo to Vercel).
+- [x] E5 — Automatic deployment from `main` through Vercel.
 - [x] E6 — No secrets are in the project files; `.env.example` lists the variable name only.
-- [ ] E7 — Complete this README with the live Vercel URL after deployment.
+- [x] E7 — README includes the live Vercel URL.
 
 ## Stack
 
