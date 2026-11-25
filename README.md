@@ -35,9 +35,9 @@ GitHub Actions runs both commands on pushes to `main` and pull requests.
 
 ### Should
 
-- [ ] S1 — Google sign-in and profile.
-- [ ] S2 — Edit/delete own recipes.
-- [ ] S3 — One rating per signed-in user and no self-rating.
+- [ ] S1 — Google sign-in and profile (code is ready; configure Google OAuth credentials in Vercel).
+- [x] S2 — Edit/delete your own recipes after Google sign-in.
+- [x] S3 — One rating per signed-in user; recipe authors cannot rate their own recipes.
 - [x] S4 — Upload JPG, PNG, or WebP recipe images (up to 2 MB).
 - [x] S5 — Search across titles, authors, cuisine, category, ingredients, and steps.
 - [x] S6 — Sort newest and highest rated.

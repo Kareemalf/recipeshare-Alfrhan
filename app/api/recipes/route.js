@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { addRecipe, getRecipes, hasDatabase } from "@/lib/db";
 import { validateRecipe } from "@/lib/recipe-utils";
 
@@ -15,19 +16,19 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: "Sign in with Google to share a recipe." }, { status: 401 });
   try {
     const input = await request.json();
-    const missing = validateRecipe(input);
+    const author = session.user.name || session.user.email || "RecipeShare member";
+    const missing = validateRecipe({ ...input, author });
     if (missing.length) return NextResponse.json({ missing }, { status: 400 });
     const recipe = await addRecipe({
-      author: String(input.author).trim(),
-      title: String(input.title).trim(),
-      cuisine: input.cuisine,
-      category: input.category,
+      author, ownerId: session.user.id, title: String(input.title).trim(),
+      cuisine: input.cuisine, category: input.category,
       ingredients: input.ingredients.map((item) => String(item).trim()).filter(Boolean),
       steps: input.steps.map((item) => String(item).trim()).filter(Boolean),
-      prepTime: Number(input.prepTime),
-      imageUrl: String(input.imageUrl).trim()
+      prepTime: Number(input.prepTime), imageUrl: String(input.imageUrl).trim()
     });
     return NextResponse.json({ recipe }, { status: 201 });
   } catch (error) {

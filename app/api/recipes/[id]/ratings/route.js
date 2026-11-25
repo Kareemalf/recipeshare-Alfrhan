@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { addRating } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request, { params }) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: "Sign in with Google to rate recipes." }, { status: 401 });
   const { id } = await params;
   const body = await request.json();
   const value = Number(body.value);
   if (!Number.isInteger(value) || value < 1 || value > 5) return NextResponse.json({ error: "Choose a rating from 1 to 5 stars." }, { status: 400 });
   try {
-    const recipe = await addRating(id, value);
+    const recipe = await addRating(id, value, session.user.id);
     if (!recipe) return NextResponse.json({ error: "Recipe not found." }, { status: 404 });
-    if (recipe.error) return NextResponse.json({ error: recipe.error }, { status: 503 });
+    if (recipe.error) return NextResponse.json({ error: recipe.error }, { status: 403 });
     return NextResponse.json({ recipe });
   } catch (error) {
     console.error("Rating save failed:", error);

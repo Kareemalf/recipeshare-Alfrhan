@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { getRecipe, hasDatabase } from "@/lib/db";
 import RatingControl from "./rating-control";
+import RecipeActions from "./recipe-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +15,12 @@ export async function generateMetadata({ params }) {
 
 export default async function RecipePage({ params }) {
   const { id } = await params;
-  const recipe = await getRecipe(id);
+  const session = await auth();
+  const recipe = await getRecipe(id, session?.user?.id || null);
   if (!recipe) notFound();
 
   return <main className="detail-page">
-    <header className="topbar"><Link className="brand" href="/"><span className="brand-mark">R</span> RecipeShare</Link><Link className="nav-link" href="/">← All recipes</Link></header>
+    <header className="topbar"><Link className="brand" href="/"><span className="brand-mark">R</span> RecipeShare</Link><div className="topbar-actions"><Link className="nav-link" href="/">← All recipes</Link>{session?.user ? <span className="profile-name">{session.user.name}</span> : <Link className="nav-link" href="/api/auth/signin">Sign in</Link>}</div></header>
     <article className="detail">
       <div className="detail-image"><img src={recipe.imageUrl} alt={recipe.title}/></div>
       <div className="detail-copy">
@@ -29,7 +32,8 @@ export default async function RecipePage({ params }) {
           <section><p className="eyebrow">WHAT YOU’LL NEED</p><ul className="ingredient-list">{recipe.ingredients.map((item, index) => <li key={index}>{item}</li>)}</ul></section>
           <section><p className="eyebrow">LET’S MAKE IT</p><ol className="steps-list">{recipe.steps.map((item, index) => <li key={index}><span>{String(index + 1).padStart(2, "0")}</span>{item}</li>)}</ol></section>
         </div>
-        <RatingControl recipeId={recipe.id} initialAverage={recipe.average || 0} initialCount={recipe.ratingCount || 0}/>
+        {recipe.ownerId === session?.user?.id && <RecipeActions recipe={recipe}/>}
+        <RatingControl recipeId={recipe.id} initialAverage={recipe.average || 0} initialCount={recipe.ratingCount || 0} initialUserRating={recipe.userRating || null} isOwner={recipe.ownerId === session?.user?.id} signedIn={Boolean(session?.user?.id)}/>
         {!hasDatabase && <p className="notice">Add DATABASE_URL to save ratings across visits.</p>}
       </div>
     </article>

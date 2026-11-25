@@ -16,9 +16,9 @@ This document tracks the requirements from the ECE 35400 Final Activity: RecipeS
 - [ ] M7 Seed at least two distinct sample recipes.
 
 ## Should features
-- [ ] S1 Google sign-in and profile.
-- [ ] S2 Edit/delete own recipes.
-- [ ] S3 One rating per signed-in user; no self-rating.
+- [ ] S1 Google sign-in and profile (application code is ready; configure OAuth credentials).
+- [x] S2 Edit/delete own recipes.
+- [x] S3 One rating per signed-in user; no self-rating.
 - [x] S4 Upload JPG, PNG, or WebP recipe images (up to 2 MB).
 - [x] S5 Search recipe titles, authors, cuisines, categories, ingredients, and steps.
 - [x] S6 Sort newest and highest rated.
