@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { CATEGORIES, CUISINES, filterRecipes, searchAndSortRecipes } from "@/lib/recipe-utils";
 
@@ -11,6 +12,7 @@ function Stars({ average, count }) {
 }
 
 export default function Home() {
+  const { data: session } = useSession();
   const [recipes, setRecipes] = useState([]);
   const [cuisine, setCuisine] = useState("");
   const [category, setCategory] = useState("");
@@ -53,7 +55,7 @@ export default function Home() {
     setNotice("");
     setSaving(true);
     const payload = {
-      ...form,
+      ...form, author: session?.user?.name || "",
       prepTime: Number(form.prepTime),
       ingredients: form.ingredients.split("\n").map((item) => item.trim()).filter(Boolean),
       steps: form.steps.split("\n").map((item) => item.trim()).filter(Boolean)
@@ -73,7 +75,7 @@ export default function Home() {
   }
 
   return <main>
-    <header className="topbar"><Link className="brand" href="/"> <span className="brand-mark">R</span> RecipeShare</Link><a className="nav-link" href="#share">Share a recipe <span>↗</span></a></header>
+    <header className="topbar"><Link className="brand" href="/"> <span className="brand-mark">R</span> RecipeShare</Link><div className="topbar-actions">{session?.user ? <><span className="profile-name">Hi, {session.user.name?.split(" ")[0]}</span><button className="text-button" onClick={() => signOut()}>Sign out</button></> : <button className="nav-link sign-in-button" onClick={() => signIn("google")}>Sign in with Google</button>}<a className="nav-link" href="#share">Share a recipe <span>↗</span></a></div></header>
     <section className="hero">
       <div className="hero-copy">
         <p className="eyebrow">GOOD FOOD TRAVELS</p>
@@ -105,16 +107,16 @@ export default function Home() {
 
     <section className="share-section" id="share">
       <div className="share-intro"><p className="eyebrow">YOUR TURN TO PASS IT ON</p><h2>Got a good one?</h2><p>Add a recipe that means something to you. Someone’s next favorite meal might start right here.</p><span className="handwritten">From your kitchen, with love. <b>♥</b></span></div>
-      <form className="recipe-form" onSubmit={submit}>
+      {session?.user ? <form className="recipe-form" onSubmit={submit}>
         <div className="form-title"><span>01 — SHARE A RECIPE</span><small>All fields are required</small></div>
         {errors.length > 0 && <div className="error-box" role="alert"><strong>Please fill in or fix these fields:</strong><ul>{errors.map((error) => <li key={error}>{error}</li>)}</ul></div>}
-        <div className="form-row"><label>Your name<input value={form.author} onChange={(e) => update("author", e.target.value)} placeholder="Who’s cooking?" required/></label><label>Recipe title<input value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="The name of your dish" required/></label></div>
+        <div className="form-row"><label>Sharing as<small>{session?.user?.name}</small></label><label>Recipe title<input value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="The name of your dish" required/></label></div>
         <div className="form-row"><label>Cuisine<select value={form.cuisine} onChange={(e) => update("cuisine", e.target.value)} required><option value="">Choose one</option>{CUISINES.map((item) => <option key={item}>{item}</option>)}</select></label><label>Category<select value={form.category} onChange={(e) => update("category", e.target.value)} required><option value="">Choose one</option>{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label></div>
         <label>Ingredients <small>One ingredient per line</small><textarea rows="4" value={form.ingredients} onChange={(e) => update("ingredients", e.target.value)} placeholder={"2 cups flour\n1 tsp salt"} required/></label>
         <label>Steps <small>One step per line</small><textarea rows="4" value={form.steps} onChange={(e) => update("steps", e.target.value)} placeholder={"Mix the dry ingredients…\nBake until golden…"} required/></label>
         <div className="form-row"><label>Prep time <small>Minutes</small><input type="number" min="1" value={form.prepTime} onChange={(e) => update("prepTime", e.target.value)} placeholder="30" required/></label><label>Upload image <small>JPG, PNG, or WebP · up to 2 MB</small><input type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadImage} required={!form.imageUrl}/>{form.imageUrl && <img className="upload-preview" src={form.imageUrl} alt="Recipe image preview"/>}</label></div>
         <button className="button button-dark submit-button" type="submit" disabled={saving}>{saving ? "Adding your recipe…" : "Add to the table"} <span>→</span></button>
-      </form>
+      </form> : <div className="signin-card"><p>Sign in to share your recipes and manage the ones you add.</p><button className="button button-dark" onClick={() => signIn("google")}>Continue with Google <span>→</span></button></div>}
     </section>
     <footer><Link className="brand" href="/"><span className="brand-mark">R</span> RecipeShare</Link><span>Good food is better together.</span><span>© 2026 RecipeShare</span></footer>
   </main>;
