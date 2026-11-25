@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CATEGORIES, CUISINES, filterRecipes } from "@/lib/recipe-utils";
+import { CATEGORIES, CUISINES, filterRecipes, searchAndSortRecipes } from "@/lib/recipe-utils";
 
 const emptyForm = { author: "", title: "", cuisine: "", category: "", ingredients: "", steps: "", prepTime: "", imageUrl: "" };
 
@@ -14,6 +14,8 @@ export default function Home() {
   const [recipes, setRecipes] = useState([]);
   const [cuisine, setCuisine] = useState("");
   const [category, setCategory] = useState("");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("newest");
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState([]);
   const [notice, setNotice] = useState("");
@@ -33,8 +35,17 @@ export default function Home() {
   }
   useEffect(() => { loadRecipes(); }, []);
 
-  const visibleRecipes = useMemo(() => filterRecipes(recipes, cuisine, category), [recipes, cuisine, category]);
+  const visibleRecipes = useMemo(() => searchAndSortRecipes(filterRecipes(recipes, cuisine, category), query, sort), [recipes, cuisine, category, query, sort]);
   function update(field, value) { setForm((previous) => ({ ...previous, [field]: value })); }
+  function uploadImage(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) { setErrors(["Choose a JPG, PNG, or WebP image."]); return; }
+    if (file.size > 2 * 1024 * 1024) { setErrors(["Choose an image smaller than 2 MB."]); return; }
+    const reader = new FileReader();
+    reader.onload = () => update("imageUrl", String(reader.result));
+    reader.readAsDataURL(file);
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -82,7 +93,7 @@ export default function Home() {
       <div className="filters">
         <label>Cuisine <select value={cuisine} onChange={(event) => setCuisine(event.target.value)}><option value="">All cuisines</option>{CUISINES.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Category <select value={category} onChange={(event) => setCategory(event.target.value)}><option value="">All categories</option>{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
-        {(cuisine || category) && <button className="text-button" onClick={() => { setCuisine(""); setCategory(""); }}>Clear filters</button>}
+        {(cuisine || category || query || sort !== "newest") && <button className="text-button" onClick={() => { setCuisine(""); setCategory(""); setQuery(""); setSort("newest"); }}>Clear filters</button>}
       </div>
       {notice && <p className="notice" role="status">{notice}</p>}
       {loading ? <p className="empty-state">Setting the table…</p> : visibleRecipes.length === 0 ? <p className="empty-state">No recipes found. Try clearing a filter.</p> :
@@ -101,7 +112,7 @@ export default function Home() {
         <div className="form-row"><label>Cuisine<select value={form.cuisine} onChange={(e) => update("cuisine", e.target.value)} required><option value="">Choose one</option>{CUISINES.map((item) => <option key={item}>{item}</option>)}</select></label><label>Category<select value={form.category} onChange={(e) => update("category", e.target.value)} required><option value="">Choose one</option>{CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label></div>
         <label>Ingredients <small>One ingredient per line</small><textarea rows="4" value={form.ingredients} onChange={(e) => update("ingredients", e.target.value)} placeholder={"2 cups flour\n1 tsp salt"} required/></label>
         <label>Steps <small>One step per line</small><textarea rows="4" value={form.steps} onChange={(e) => update("steps", e.target.value)} placeholder={"Mix the dry ingredients…\nBake until golden…"} required/></label>
-        <div className="form-row"><label>Prep time <small>Minutes</small><input type="number" min="1" value={form.prepTime} onChange={(e) => update("prepTime", e.target.value)} placeholder="30" required/></label><label>Image link <small>Use a photo URL</small><input type="url" value={form.imageUrl} onChange={(e) => update("imageUrl", e.target.value)} placeholder="https://…" required/></label></div>
+        <div className="form-row"><label>Prep time <small>Minutes</small><input type="number" min="1" value={form.prepTime} onChange={(e) => update("prepTime", e.target.value)} placeholder="30" required/></label><label>Upload image <small>JPG, PNG, or WebP · up to 2 MB</small><input type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadImage} required={!form.imageUrl}/>{form.imageUrl && <img className="upload-preview" src={form.imageUrl} alt="Recipe image preview"/>}</label></div>
         <button className="button button-dark submit-button" type="submit" disabled={saving}>{saving ? "Adding your recipe…" : "Add to the table"} <span>→</span></button>
       </form>
     </section>

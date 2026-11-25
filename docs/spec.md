@@ -19,9 +19,9 @@ This document tracks the requirements from the ECE 35400 Final Activity: RecipeS
 - [ ] S1 Google sign-in and profile.
 - [ ] S2 Edit/delete own recipes.
 - [ ] S3 One rating per signed-in user; no self-rating.
-- [ ] S4 Upload recipe image.
-- [ ] S5 Keyword search.
-- [ ] S6 Sort newest and highest rated.
+- [x] S4 Upload JPG, PNG, or WebP recipe images (up to 2 MB).
+- [x] S5 Search recipe titles, authors, cuisines, categories, ingredients, and steps.
+- [x] S6 Sort newest and highest rated.
 
 ## Could features
 - [ ] Could: responsive phone layout.
